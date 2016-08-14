@@ -4,6 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Dom1nicLivestream.iml" filepath="$PROJECT_DIR$/Dom1nicLivestream.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio-new/vitamio-new.iml" filepath="$PROJECT_DIR$/vitamio-new/vitamio-new.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio1/vitamio1.iml" filepath="$PROJECT_DIR$/vitamio1/vitamio1.iml" />
     </modules>
   </component>
 </project>
