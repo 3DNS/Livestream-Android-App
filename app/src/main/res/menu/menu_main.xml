@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="dom1nic.livestream.MainActivity">
+    <item
+        android:id="@+id/action_website"
+        android:title="@string/action_website"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/close"
+        android:orderInCategory="100"
+        android:title="@string/close"
+        app:showAsAction="never" />
+</menu>
