@@ -1,16 +1,8 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">DoM!niC</string>
     <string name="close">Exit</string>
+    <string name="livestream">Livestream</string>
     <string name="action_website">Website</string>
-    <string name="enable_background_audio">Play in background</string>
-    <string name="video">Video</string>
-    <string name="audio">Audio</string>
-    <string name="text">Text</string>
-    <string name="logging">Logging</string>
-    <string name="logging_normal">Normal</string>
-    <string name="logging_verbose">Verbose</string>
-    <string name="retry">Retry</string>
-    <string name="off">[off]</string>
     <string name="error_drm_not_supported">Protected content not supported on API levels below 18</string>
     <string name="error_drm_unsupported_scheme">This device does not support the required DRM scheme</string>
     <string name="error_drm_unknown">An unknown DRM error occurred</string>

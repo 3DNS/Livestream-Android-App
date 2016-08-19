@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,7 +22,6 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.accessibility.CaptioningManager;
-import android.webkit.WebView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,7 +64,7 @@ import dom1nic.livestream.player.SmoothStreamingRendererBuilder;
 /**
  * An activity that plays media using {@link Player}.
  */
-public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback,
+public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolder.Callback,
         Player.Listener, Player.Id3MetadataListener,
         AudioCapabilitiesReceiver.Listener {
 
@@ -78,7 +76,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
 
-    private static final String TAG = "PlayerActivity";
+    private static final String TAG = "PlayerFullAcivity";
     private static final int MENU_GROUP_TRACKS = 1;
     private static final int ID_OFFSET = 2;
 
@@ -112,28 +110,35 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.player_activity);
+        setContentView(R.layout.player_full);
         View root = findViewById(R.id.root);
+        root.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    toggleControlsVisibility();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    view.performClick();
+                }
+                return true;
+            }
+        });
+        root.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE
+                        || keyCode == KeyEvent.KEYCODE_MENU) {
+                    return false;
+                }
+                return mediaController.dispatchKeyEvent(event);
+            }
+        });
 
-        WebView webview;
-        webview = (WebView) findViewById(R.id.webview);
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.loadUrl("http://dom1nic.eu/chat/android.html" +
-                "");
         shutterView = findViewById(R.id.shutter);
 
         videoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
-
-        findViewById(R.id.surface_view).setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
-                        .setData(Uri.parse("http://rtmp.dom1nic.eu:8080/hls/stream/index.m3u8"));
-                startActivity(Intent);
-            }
-        });
 
         mediaController = new KeyCompatibleMediaController(this);
         mediaController.setAnchorView(root);
