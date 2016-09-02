@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -50,11 +52,17 @@ import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.RunnableFuture;
 
 import dom1nic.livestream.player.DashRendererBuilder;
 import dom1nic.livestream.player.Player;
@@ -83,6 +91,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     private static final int ID_OFFSET = 2;
 
     private static final CookieManager defaultCookieManager;
+
     static {
         defaultCookieManager = new CookieManager();
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
@@ -105,6 +114,8 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     private String contentId;
     private String provider;
 
+    private Handler handler=new Handler();
+
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
 
     // Activity lifecycle
@@ -114,6 +125,8 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_activity);
         View root = findViewById(R.id.root);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         WebView webview;
         webview = (WebView) findViewById(R.id.webview);
@@ -126,7 +139,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
 
-        findViewById(R.id.surface_view).setOnClickListener( new View.OnClickListener() {
+        findViewById(R.id.surface_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
@@ -145,6 +158,35 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
 
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
+
+        new VisitorCountLoader().execute();
+    }
+
+    class VisitorCountLoader extends AsyncTask<Void, Void, Integer> {
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new URL("http://dom1nic.eu/viewer/count.php").openConnection();
+                BufferedReader bin = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String i = bin.readLine();
+                return Integer.parseInt(i);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            ((TextView) findViewById(R.id.viewer)).setText("Zuschauer: " + integer);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    new VisitorCountLoader().execute();
+                }
+            }, 4 * 1000);
+        }
     }
 
     @Override
@@ -255,7 +297,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     @TargetApi(23)
     private boolean maybeRequestPermission() {
         if (requiresPermission(contentUri)) {
-            requestPermissions(new String[] {permission.READ_EXTERNAL_STORAGE}, 0);
+            requestPermissions(new String[]{permission.READ_EXTERNAL_STORAGE}, 0);
             return true;
         } else {
             return false;
@@ -331,7 +373,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
             showControls();
         }
         String text = "playWhenReady=" + playWhenReady + ", playbackState=";
-        switch(playbackState) {
+        switch (playbackState) {
             case ExoPlayer.STATE_BUFFERING:
                 text += "buffering";
                 break;
@@ -444,7 +486,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         return format.trackId == null ? "" : " (" + format.trackId + ")";
     }
 
-    private void toggleControlsVisibility()  {
+    private void toggleControlsVisibility() {
         if (mediaController.isShowing()) {
             mediaController.hide();
         } else {
