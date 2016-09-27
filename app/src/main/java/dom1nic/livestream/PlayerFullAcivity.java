@@ -21,9 +21,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
-import android.view.accessibility.CaptioningManager;
 import android.widget.MediaController;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
@@ -41,10 +39,6 @@ import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.metadata.id3.PrivFrame;
 import com.google.android.exoplayer.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer.metadata.id3.TxxxFrame;
-import com.google.android.exoplayer.text.CaptionStyleCompat;
-import com.google.android.exoplayer.text.Cue;
-import com.google.android.exoplayer.text.SubtitleLayout;
-import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
@@ -55,10 +49,10 @@ import java.util.List;
 import java.util.Locale;
 
 import dom1nic.livestream.player.DashRendererBuilder;
-import dom1nic.livestream.player.Player;
-import dom1nic.livestream.player.Player.RendererBuilder;
 import dom1nic.livestream.player.ExtractorRendererBuilder;
 import dom1nic.livestream.player.HlsRendererBuilder;
+import dom1nic.livestream.player.Player;
+import dom1nic.livestream.player.Player.RendererBuilder;
 import dom1nic.livestream.player.SmoothStreamingRendererBuilder;
 
 /**
@@ -116,7 +110,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    toggleControlsVisibility();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     view.performClick();
                 }
@@ -139,9 +132,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
         videoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
-
-        mediaController = new KeyCompatibleMediaController(this);
-        mediaController.setAnchorView(root);
 
         CookieHandler currentHandler = CookieHandler.getDefault();
         if (currentHandler != defaultCookieManager) {
@@ -302,8 +292,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
             player.setMetadataListener(this);
             player.seekTo(playerPosition);
             playerNeedsPrepare = true;
-            mediaController.setMediaPlayer(player.getPlayerControl());
-            mediaController.setEnabled(true);
             eventLogger = new EventLogger();
             eventLogger.startSession();
             player.addListener(eventLogger);
@@ -333,7 +321,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == ExoPlayer.STATE_ENDED) {
-            showControls();
         }
         String text = "playWhenReady=" + playWhenReady + ", playbackState=";
         switch(playbackState) {
@@ -391,7 +378,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
             Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_LONG).show();
         }
         playerNeedsPrepare = true;
-        showControls();
     }
 
     @Override
@@ -447,18 +433,6 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
 
     private static String buildTrackIdString(MediaFormat format) {
         return format.trackId == null ? "" : " (" + format.trackId + ")";
-    }
-
-    private void toggleControlsVisibility()  {
-        if (mediaController.isShowing()) {
-            mediaController.hide();
-        } else {
-            showControls();
-        }
-    }
-
-    private void showControls() {
-        mediaController.show(0);
     }
 
     // Player.MetadataListener implementation
