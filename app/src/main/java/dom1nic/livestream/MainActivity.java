@@ -3,6 +3,7 @@ package dom1nic.livestream;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        menu.findItem(R.id.noti).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noti", true));
         return true;
     }
 
@@ -57,7 +59,11 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.close) {
             android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(1);
+            finish();
+        }
+        if (id == R.id.noti) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("noti", item.isChecked()).apply();
         }
         return super.onOptionsItemSelected(item);
     }
