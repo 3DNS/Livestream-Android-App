@@ -13,18 +13,17 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
-import android.view.accessibility.CaptioningManager;
 import android.webkit.WebView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -45,14 +44,9 @@ import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.metadata.id3.PrivFrame;
 import com.google.android.exoplayer.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer.metadata.id3.TxxxFrame;
-import com.google.android.exoplayer.text.CaptionStyleCompat;
-import com.google.android.exoplayer.text.Cue;
-import com.google.android.exoplayer.text.SubtitleLayout;
-import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.CookieHandler;
@@ -62,13 +56,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.RunnableFuture;
 
 import dom1nic.livestream.player.DashRendererBuilder;
-import dom1nic.livestream.player.Player;
-import dom1nic.livestream.player.Player.RendererBuilder;
 import dom1nic.livestream.player.ExtractorRendererBuilder;
 import dom1nic.livestream.player.HlsRendererBuilder;
+import dom1nic.livestream.player.Player;
+import dom1nic.livestream.player.Player.RendererBuilder;
 import dom1nic.livestream.player.SmoothStreamingRendererBuilder;
 
 /**
@@ -114,7 +107,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     private String contentId;
     private String provider;
 
-    private Handler handler=new Handler();
+    private Handler handler = new Handler();
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
 
@@ -131,7 +124,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         WebView webview;
         webview = (WebView) findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.loadUrl("http://dom1nic.eu/chat/android.html" +
+        webview.loadUrl("http://livechat.dom1nic.eu/" +
                 "");
         shutterView = findViewById(R.id.shutter);
 
@@ -142,8 +135,10 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         findViewById(R.id.surface_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+                Log.i("Streaming", url);
                 Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
-                        .setData(Uri.parse("http://rtmp.dom1nic.eu:8080/hls/stream/index.m3u8"));
+                        .setData(Uri.parse(url));
                 startActivity(Intent);
             }
         });
@@ -210,6 +205,39 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         if (Util.SDK_INT <= 23 || player == null) {
             onShown();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        menu.findItem(R.id.noti).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noti", true));
+        menu.findItem(R.id.quali).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("quali", true));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_website) {
+            Uri uriUrl = Uri.parse("http://dom1nic.eu");
+            Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+            startActivity(launchBrowser);
+            return true;
+        }
+        if (id == R.id.close) {
+            android.os.Process.killProcess(android.os.Process.myPid());
+            finish();
+        }
+        if (id == R.id.noti) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("noti", item.isChecked()).apply();
+        }
+        if (id == R.id.quali) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void onShown() {

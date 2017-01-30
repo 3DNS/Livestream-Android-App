@@ -12,6 +12,11 @@
         android:title="Benachrichtigung"
         app:showAsAction="never" />
     <item
+        android:id="@+id/quali"
+        android:checkable="true"
+        android:title="HD Qualität"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/close"
         android:orderInCategory="100"
         android:title="@string/close"

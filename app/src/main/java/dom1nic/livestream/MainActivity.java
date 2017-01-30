@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +34,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+                Log.i("Streaming", url);
                 Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
-                        .setData(Uri.parse("http://rtmp.dom1nic.eu:8080/hls/stream/index.m3u8"));
+                        .setData(Uri.parse(url));
                 startActivity(Intent);
             }
         });
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         menu.findItem(R.id.noti).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noti", true));
+        menu.findItem(R.id.quali).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("quali", true));
         return true;
     }
 
@@ -64,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.noti) {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("noti", item.isChecked()).apply();
+        }
+        if (id == R.id.quali) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
         }
         return super.onOptionsItemSelected(item);
     }
