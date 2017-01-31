@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(Intent);
             }
         });
+
+        startService(new Intent(this, PlayerService.class));
     }
 
     @Override

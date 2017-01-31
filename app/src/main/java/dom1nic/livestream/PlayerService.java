@@ -42,7 +42,7 @@ public class PlayerService extends Service {
                 @Override
                 protected Integer doInBackground(Void... params) {
                     try {
-                        HttpURLConnection conn = (HttpURLConnection) new URL("http://dom1nic.eu/viewer/stream.php").openConnection();
+                        HttpURLConnection conn = (HttpURLConnection) new URL("http://dom1nic.eu/viewer/stream.php?channel=live").openConnection();
                         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                         String status = in.readLine();
                         return Integer.parseInt(status);
