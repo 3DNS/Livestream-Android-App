@@ -209,7 +209,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_player, menu);
         menu.findItem(R.id.noti).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noti", true));
         menu.findItem(R.id.quali).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("quali", true));
         return true;
@@ -219,16 +219,6 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_website) {
-            Uri uriUrl = Uri.parse("http://dom1nic.eu");
-            Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
-            startActivity(launchBrowser);
-            return true;
-        }
-        if (id == R.id.close) {
-            android.os.Process.killProcess(android.os.Process.myPid());
-            finish();
-        }
         if (id == R.id.noti) {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("noti", item.isChecked()).apply();
@@ -236,6 +226,11 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         if (id == R.id.quali) {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
+            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            Log.i("Streaming", url);
+            Intent Intent = new Intent(PlayerActivity.this, PlayerActivity.class)
+                    .setData(Uri.parse(url));
+            startActivity(Intent);
         }
         return super.onOptionsItemSelected(item);
     }

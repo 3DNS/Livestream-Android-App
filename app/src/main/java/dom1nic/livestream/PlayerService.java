@@ -65,7 +65,7 @@ public class PlayerService extends Service {
                         builder.setContentTitle("DoM!niC Livestream");
                         builder.setContentText("ist jetzt online!");
                         builder.setContentIntent(PendingIntent.getActivity(PlayerService.this, 7613, new Intent(PlayerService.this, PlayerActivity.class).setData(Uri.parse("http://rtmp.dom1nic.eu:8080/hls/stream/index.m3u8")), 0));
-                        builder.setSmallIcon(android.R.drawable.ic_media_play);
+                        builder.setSmallIcon(R.drawable.ic_play_arrow_white_48dp);
                         builder.setAutoCancel(true);
                         builder.setVibrate(new long[]{100, 100, 600, 100});
                         builder.setLights(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary), 400, 600);
