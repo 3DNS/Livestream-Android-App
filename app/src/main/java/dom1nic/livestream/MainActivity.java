@@ -1,7 +1,9 @@
 package dom1nic.livestream;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -13,7 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+
 public class MainActivity extends AppCompatActivity {
+
+    private ProgressDialog streamLoader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,15 +43,51 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
-                Log.i("Streaming", url);
-                Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
-                        .setData(Uri.parse(url));
-                startActivity(Intent);
+                if (streamLoader != null) streamLoader.dismiss();
+                streamLoader = ProgressDialog.show(MainActivity.this, "Laden", "Laden", true);
+                new StreamTester().execute();
             }
         });
 
         startService(new Intent(this, PlayerService.class));
+    }
+
+    public class StreamTester extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String content = "", line;
+                while ((line = reader.readLine()) != null)
+                    content += line;
+                if (content.toLowerCase().contains("403 - access denied"))
+                    throw new Exception();
+                return Boolean.TRUE;
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            streamLoader.dismiss();
+            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            if (success) {
+                Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
+                Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
+                        .setData(Uri.parse(url)).putExtra("url", url);
+                startActivity(Intent);
+            } else {
+                url = "http://rtmp.dom1nic.eu:8080/break.mp4";
+                Log.i("MODE", "PLAYBACK");
+                Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
+                        .setData(Uri.parse(url)).putExtra("url", url);
+                startActivity(Intent);
+            }
+        }
     }
 
     @Override

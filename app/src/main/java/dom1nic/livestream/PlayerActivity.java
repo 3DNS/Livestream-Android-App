@@ -6,6 +6,7 @@ package dom1nic.livestream;
 
 import android.Manifest.permission;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -107,6 +108,10 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
     private String contentId;
     private String provider;
 
+    private ProgressDialog streamLoader;
+
+    private String url;
+
     private Handler handler = new Handler();
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
@@ -131,15 +136,14 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         videoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
+        url = getIntent().getStringExtra("url");
 
         findViewById(R.id.surface_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
-                Log.i("Streaming", url);
-                Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
-                        .setData(Uri.parse(url));
-                startActivity(Intent);
+                if (streamLoader != null) streamLoader.dismiss();
+                streamLoader = ProgressDialog.show(PlayerActivity.this, "Laden", "Laden", true);
+                new StreamTester().execute();
             }
         });
 
@@ -155,6 +159,44 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         audioCapabilitiesReceiver.register();
 
         new VisitorCountLoader().execute();
+    }
+
+    public class StreamTester extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String content = "", line;
+                while ((line = reader.readLine()) != null)
+                    content += line;
+                if (content.toLowerCase().contains("403 - access denied"))
+                    throw new Exception();
+                return Boolean.TRUE;
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            streamLoader.dismiss();
+            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            if (success) {
+                Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
+                Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
+                        .setData(Uri.parse(url)).putExtra("url", url);
+                startActivity(Intent);
+            } else {
+                url = "http://rtmp.dom1nic.eu:8080/break.mp4";
+                Log.i("MODE", "PLAYBACK");
+                Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
+                        .setData(Uri.parse(url)).putExtra("url", url);
+                startActivity(Intent);
+            }
+        }
     }
 
     class VisitorCountLoader extends AsyncTask<Void, Void, Integer> {
