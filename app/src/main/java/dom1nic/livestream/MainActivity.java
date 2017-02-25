@@ -120,6 +120,20 @@ public class MainActivity extends AppCompatActivity {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
         }
+        if (id == R.id.last) {
+            String url = "http://dom1nic.eu/videos/archiv/BF-Bad-Company2-2.mp4";
+            Log.i("Streaming", url);
+            Intent Intent = new Intent(MainActivity.this, LastActivity.class)
+                    .setData(Uri.parse(url));
+            startActivity(Intent);
+        }
+        if (id == R.id.last_text) {
+            String url = "http://dom1nic.eu/videos/archiv/BF-Bad-Company2-2.mp4";
+            Log.i("Streaming", url);
+            Intent Intent = new Intent(MainActivity.this, LastActivity.class)
+                    .setData(Uri.parse(url));
+            startActivity(Intent);
+        }
         return super.onOptionsItemSelected(item);
     }
 }
