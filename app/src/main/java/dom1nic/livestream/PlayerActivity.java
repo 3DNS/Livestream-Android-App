@@ -129,7 +129,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         WebView webview;
         webview = (WebView) findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.loadUrl("http://livechat.dom1nic.eu/" +
+        webview.loadUrl("https://livechat.dom1nic.eu/" +
                 "");
         shutterView = findViewById(R.id.shutter);
 
@@ -165,7 +165,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             try {
                 HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -183,14 +183,14 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         @Override
         protected void onPostExecute(Boolean success) {
             streamLoader.dismiss();
-            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             if (success) {
                 Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
                 Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
                 startActivity(Intent);
             } else {
-                url = "http://rtmp.dom1nic.eu:8080/break.mp4";
+                url = "https://rtmp.3dns.eu/break.mp4";
                 Log.i("MODE", "PLAYBACK");
                 Intent Intent = new Intent(PlayerActivity.this, PlayerFullAcivity.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
@@ -204,7 +204,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                HttpURLConnection conn = (HttpURLConnection) new URL("http://dom1nic.eu/viewer/count.php").openConnection();
+                HttpURLConnection conn = (HttpURLConnection) new URL("https://dom1nic.eu/viewer/count.php").openConnection();
                 BufferedReader bin = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String i = bin.readLine();
                 return Integer.parseInt(i);
@@ -268,7 +268,7 @@ public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.C
         if (id == R.id.quali) {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
-            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(PlayerActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             Log.i("Streaming", url);
             Intent Intent = new Intent(PlayerActivity.this, PlayerActivity.class)
                     .setData(Uri.parse(url));

@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uriUrl = Uri.parse("http://dom1nic.eu");
+                Uri uriUrl = Uri.parse("https://dom1nic.eu");
                 Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
                 startActivity(launchBrowser);
             }
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             try {
                 HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -74,14 +74,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             streamLoader.dismiss();
-            String url = "http://rtmp.dom1nic.eu:8080/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hls" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             if (success) {
                 Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
                 Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
                 startActivity(Intent);
             } else {
-                url = "http://rtmp.dom1nic.eu:8080/break.mp4";
+                url = "https://rtmp.3dns.eu/break.mp4";
                 Log.i("MODE", "PLAYBACK");
                 Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_website) {
-            Uri uriUrl = Uri.parse("http://dom1nic.eu");
+            Uri uriUrl = Uri.parse("https://dom1nic.eu");
             Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
             startActivity(launchBrowser);
             return true;
@@ -121,14 +121,14 @@ public class MainActivity extends AppCompatActivity {
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
         }
         if (id == R.id.last) {
-            String url = "http://dom1nic.eu/videos/archiv/BF-Bad-Company2-2.mp4";
+            String url = "https://rtmp.dom1nic.eu:8080/recent.json";
             Log.i("Streaming", url);
             Intent Intent = new Intent(MainActivity.this, LastActivity.class)
                     .setData(Uri.parse(url));
             startActivity(Intent);
         }
         if (id == R.id.last_text) {
-            String url = "http://dom1nic.eu/videos/archiv/BF-Bad-Company2-2.mp4";
+            String url = "https://rtmp.dom1nic.eu:8080/recent.json";
             Log.i("Streaming", url);
             Intent Intent = new Intent(MainActivity.this, LastActivity.class)
                     .setData(Uri.parse(url));

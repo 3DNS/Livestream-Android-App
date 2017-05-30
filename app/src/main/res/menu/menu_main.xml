@@ -9,11 +9,13 @@
     <item
         android:id="@+id/last"
         android:title="@string/last"
+        android:visible="false"
         android:icon="@drawable/ic_av_timer_white_48dp"
         app:showAsAction="always" />
     <item
         android:id="@+id/last_text"
         android:title="@string/last"
+        android:visible="false"
         app:showAsAction="withText" />
     <item
         android:id="@+id/noti"
