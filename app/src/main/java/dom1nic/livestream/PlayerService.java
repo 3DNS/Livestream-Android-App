@@ -42,7 +42,7 @@ public class PlayerService extends Service {
                 @Override
                 protected Integer doInBackground(Void... params) {
                     try {
-                        HttpURLConnection conn = (HttpURLConnection) new URL("https://dom1nic.eu/viewer/stream.php?channel=live").openConnection();
+                        HttpURLConnection conn = (HttpURLConnection) new URL("https://cp.3dns.eu/libs/status_rtmp.php?channel=live").openConnection();
                         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                         String status = in.readLine();
                         return Integer.parseInt(status);
@@ -63,8 +63,8 @@ public class PlayerService extends Service {
                         NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                         Notification.Builder builder = new Notification.Builder(PlayerService.this);
                         builder.setContentTitle("DoM!niC Livestream");
-                        builder.setContentText("ist jetzt online!");
-                        builder.setContentIntent(PendingIntent.getActivity(PlayerService.this, 7613, new Intent(PlayerService.this, PlayerActivity.class).setData(Uri.parse("https://rtmp.dom1nic.eu:8081/hd/stream/index.m3u8")), 0));
+                        builder.setContentText("ist jetzt live!");
+                        builder.setContentIntent(PendingIntent.getActivity(PlayerService.this, 7613, new Intent(PlayerService.this, PlayerFullAcivity.class).setData(Uri.parse("https://rtmp.dom1nic.eu:8081/hd/stream/index.m3u8")), 0));
                         builder.setSmallIcon(R.drawable.ic_play_arrow_white_48dp);
                         builder.setAutoCancel(true);
                         builder.setVibrate(new long[]{100, 100, 600, 100});

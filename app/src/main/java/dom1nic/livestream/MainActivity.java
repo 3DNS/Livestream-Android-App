@@ -77,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
             String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             if (success) {
                 Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
-                Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
+                Intent Intent = new Intent(MainActivity.this, PlayerFullAcivity.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
                 startActivity(Intent);
             } else {
                 url = "https://rtmp.3dns.eu/break.mp4";
                 Log.i("MODE", "PLAYBACK");
-                Intent Intent = new Intent(MainActivity.this, PlayerActivity.class)
+                Intent Intent = new Intent(MainActivity.this, IdleFullScreen.class)
                         .setData(Uri.parse(url)).putExtra("url", url);
                 startActivity(Intent);
             }

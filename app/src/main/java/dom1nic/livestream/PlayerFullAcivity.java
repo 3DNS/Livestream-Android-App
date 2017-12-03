@@ -10,18 +10,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
+import android.widget.FrameLayout;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
@@ -42,9 +50,13 @@ import com.google.android.exoplayer.metadata.id3.TxxxFrame;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,6 +66,8 @@ import dom1nic.livestream.player.HlsRendererBuilder;
 import dom1nic.livestream.player.Player;
 import dom1nic.livestream.player.Player.RendererBuilder;
 import dom1nic.livestream.player.SmoothStreamingRendererBuilder;
+
+import static dom1nic.livestream.R.id.video_frame;
 
 /**
  * An activity that plays media using {@link Player}.
@@ -91,6 +105,8 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
 
     private long playerPosition;
     private boolean enableBackgroundAudio;
+    private Handler handler = new Handler();
+
 
     private Uri contentUri;
     private int contentType;
@@ -106,6 +122,15 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_full);
         View root = findViewById(R.id.root);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        findViewById(R.id.appBar).bringToFront();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.getBackground().setAlpha(0);
+        //toolbar.setNavigationIcon(R.drawable.ic_toolbar);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        getSupportActionBar().setElevation(0);
         root.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -129,7 +154,7 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
 
         shutterView = findViewById(R.id.shutter);
 
-        videoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
+        videoFrame = (AspectRatioFrameLayout) findViewById(video_frame);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
 
@@ -140,6 +165,61 @@ public class PlayerFullAcivity extends AppCompatActivity implements SurfaceHolde
 
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
+        new VisitorCountLoader().execute();
+
+    }
+    class VisitorCountLoader extends AsyncTask<Void, Void, Integer> {
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new URL("https://dom1nic.eu/viewer/count.php").openConnection();
+                BufferedReader bin = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String i = bin.readLine();
+                return Integer.parseInt(i);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            ((TextView) findViewById(R.id.viewer)).setText("" + integer);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    new PlayerFullAcivity.VisitorCountLoader().execute();
+                }
+            }, 4 * 1000);
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_player, menu);
+        menu.findItem(R.id.noti).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noti", true));
+        menu.findItem(R.id.quali).setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("quali", true));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.noti) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("noti", item.isChecked()).apply();
+        }
+        if (id == R.id.quali) {
+            item.setChecked(!item.isChecked());
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
+            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
+            Log.i("Streaming", url);
+            Intent Intent = new Intent(PlayerFullAcivity.this, PlayerFullAcivity.class)
+                    .setData(Uri.parse(url));
+            startActivity(Intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
