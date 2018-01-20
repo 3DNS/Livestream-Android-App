@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
+            String url = "https://rtmp.3dns.eu/dom1nic/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             try {
                 HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -74,17 +73,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             streamLoader.dismiss();
-            String url = "https://rtmp.dom1nic.eu:8081/" + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8";
             if (success) {
-                Log.i("MODE", "STREAMING " + (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean("quali", true) ? "HD" : "SD"));
-                Intent Intent = new Intent(MainActivity.this, PlayerFullAcivity.class)
-                        .setData(Uri.parse(url)).putExtra("url", url);
+                Intent Intent = new Intent(MainActivity.this, PlayerFullAcivity.class);
                 startActivity(Intent);
             } else {
-                url = "https://rtmp.3dns.eu/break.mp4";
-                Log.i("MODE", "PLAYBACK");
-                Intent Intent = new Intent(MainActivity.this, IdleFullScreen.class)
-                        .setData(Uri.parse(url)).putExtra("url", url);
+                Intent Intent = new Intent(MainActivity.this, IdleFullScreen.class);
                 startActivity(Intent);
             }
         }
@@ -120,20 +113,19 @@ public class MainActivity extends AppCompatActivity {
             item.setChecked(!item.isChecked());
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
         }
-        if (id == R.id.last) {
-            String url = "https://rtmp.dom1nic.eu:8080/recent.json";
-            Log.i("Streaming", url);
-            Intent Intent = new Intent(MainActivity.this, LastActivity.class)
-                    .setData(Uri.parse(url));
-            startActivity(Intent);
-        }
-        if (id == R.id.last_text) {
-            String url = "https://rtmp.dom1nic.eu:8080/recent.json";
-            Log.i("Streaming", url);
-            Intent Intent = new Intent(MainActivity.this, LastActivity.class)
-                    .setData(Uri.parse(url));
-            startActivity(Intent);
-        }
+       // if (id == R.id.last) {
+       //     String url = "https://rtmp.dom1nic.eu:8080/recent.json";
+       //     Log.i("Streaming", url);
+//                    .setData(Uri.parse(url));
+        //          startActivity(Intent);
+        //}
+        //if (id == R.id.last_text) {
+        //   String url = "https://rtmp.dom1nic.eu:8080/recent.json";
+        //   Log.i("Streaming", url);
+        //   Intent Intent = new Intent(MainActivity.this, LastActivity.class)
+        //           .setData(Uri.parse(url));
+        //   startActivity(Intent);
+        //}
         return super.onOptionsItemSelected(item);
     }
 }

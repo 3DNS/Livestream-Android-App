@@ -1,32 +1,39 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
-
+    signingConfigs {
+        config {
+            keyAlias 'flowx'
+            keyPassword '512512'
+            storeFile file('E:/compile/android.jks')
+            storePassword '512512'
+        }
+    }
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "dom1nic.livestream"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 14
+        targetSdkVersion 27
+        versionCode 17
         versionName "2.3"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         debug {}
         release {
         }
     }
-
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:cardview-v7:21.0.+'
-    compile 'com.android.support:recyclerview-v7:21.0.+'
+    compile 'com.android.support:appcompat-v7:27.0.2'
+    compile 'com.android.support:design:27.0.2'
+    compile 'com.android.support:cardview-v7:27.0.2'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile project(':ExoPlayer')
-
+    compile 'com.google.android.exoplayer:exoplayer:2.6.1'
 }
