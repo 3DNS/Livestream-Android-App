@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 HttpURLConnection connection = (HttpURLConnection) new java.net.URL(url).openConnection();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String content = "", line;
+                String content = "https://rtmp.3dns.eu/dom1nic/hd/stream/index.m3u8", line;
                 while ((line = reader.readLine()) != null)
                     content += line;
                 if (content.toLowerCase().contains("403 - access denied"))

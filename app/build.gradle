@@ -15,8 +15,8 @@ android {
         applicationId "dom1nic.livestream"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 17
-        versionName "2.3"
+        versionCode 18
+        versionName "2.4"
         signingConfig signingConfigs.config
     }
     buildTypes {
