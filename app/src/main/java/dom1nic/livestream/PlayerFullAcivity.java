@@ -50,189 +50,184 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class PlayerFullAcivity extends AppCompatActivity implements VideoRendererEventListener {
-        private static final String TAG = "PlayerFullAcivity";
-        private SimpleExoPlayerView simpleExoPlayerView;
-        private SimpleExoPlayer player;
-        private Handler handler = new Handler();
-    boolean navigationBarVisibility = false; //because it's visible when activity is created
+    private static final String TAG = "PlayerFullAcivity";
+    private SimpleExoPlayerView simpleExoPlayerView;
+    private SimpleExoPlayer player;
+    private Handler handler = new Handler();
 
-    private void setNavigationBarVisibility(boolean visibility){
-        if(visibility){
+    private void setNavigationBarVisibility(boolean visibility) {
+        if (!visibility) {
             View decorView = getWindow().getDecorView();
             int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
-            navigationBarVisibility = false;
         }
-
-        else
-            navigationBarVisibility = true;
     }
+
     @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.player_full);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            findViewById(R.id.appBar).bringToFront();
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            toolbar.getBackground().setAlpha(0);
-            toolbar.setTitle("");
-            toolbar.setSubtitle("");
-            getSupportActionBar().setElevation(0);
-            LoadControl loadControl = new DefaultLoadControl();
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-            setNavigationBarVisibility(navigationBarVisibility);
-            new VisitorCountLoader().execute();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.player_full);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        findViewById(R.id.appBar).bringToFront();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.getBackground().setAlpha(0);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        getSupportActionBar().setElevation(0);
+        LoadControl loadControl = new DefaultLoadControl();
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        setNavigationBarVisibility(false);
+        new VisitorCountLoader().execute();
 
 
-            simpleExoPlayerView = new SimpleExoPlayerView(this);
-            player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-            simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.video_frame);
-            simpleExoPlayerView.setUseController(false);
-            simpleExoPlayerView.requestFocus();
-            simpleExoPlayerView.setPlayer(player);
+        simpleExoPlayerView = new SimpleExoPlayerView(this);
+        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+        simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.video_frame);
+        simpleExoPlayerView.setUseController(false);
+        simpleExoPlayerView.requestFocus();
+        simpleExoPlayerView.setPlayer(player);
 
 
-            DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
-            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "App"), bandwidthMeterA);
-            Uri URL = Uri.parse("https://rtmp.3dns.eu/dom1nic/" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8");
-            MediaSource videoSource = new HlsMediaSource(URL, dataSourceFactory, 1, null, null);
-            final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
-            player.prepare(loopingSource);
+        DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "App"), bandwidthMeterA);
+        Uri URL = Uri.parse("https://rtmp.3dns.eu/dom1nic/" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8");
+        MediaSource videoSource = new HlsMediaSource(URL, dataSourceFactory, 1, null, null);
+        final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
+        player.prepare(loopingSource);
 
-            player.addListener(new ExoPlayer.EventListener() {
-                @Override
-                public void onTimelineChanged(Timeline timeline, Object manifest) {
-                    Log.v(TAG, "Listener-onTimelineChanged...");
-                }
+        player.addListener(new ExoPlayer.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
+                Log.v(TAG, "Listener-onTimelineChanged...");
+            }
 
-                @Override
-                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                    Log.v(TAG, "Listener-onTracksChanged...");
-                }
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                Log.v(TAG, "Listener-onTracksChanged...");
+            }
 
-                @Override
-                public void onLoadingChanged(boolean isLoading) {
-                    Log.v(TAG, "Listener-onLoadingChanged...isLoading:"+isLoading);
-                }
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+                Log.v(TAG, "Listener-onLoadingChanged...isLoading:" + isLoading);
+            }
 
-                @Override
-                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    Log.v(TAG, "Listener-onPlayerStateChanged..." + playbackState);
-                }
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                Log.v(TAG, "Listener-onPlayerStateChanged..." + playbackState);
+            }
 
-                @Override
-                public void onRepeatModeChanged(int repeatMode) {
-                    Log.v(TAG, "Listener-onRepeatModeChanged...");
-                }
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+                Log.v(TAG, "Listener-onRepeatModeChanged...");
+            }
 
-                @Override
-                public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
 
-                }
+            }
 
-                @Override
-                public void onPlayerError(ExoPlaybackException error) {
-                    Log.v(TAG, "Listener-onPlayerError...");
-                    player.stop();
-                    player.prepare(loopingSource);
-                    player.setPlayWhenReady(true);
-                }
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                Log.v(TAG, "Listener-onPlayerError...");
+                player.stop();
+                player.prepare(loopingSource);
+                player.setPlayWhenReady(true);
+            }
 
-                @Override
-                public void onPositionDiscontinuity(int reason) {
+            @Override
+            public void onPositionDiscontinuity(int reason) {
 
-                }
-
-
-                @Override
-                public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-                    Log.v(TAG, "Listener-onPlaybackParametersChanged...");
-                }
-
-                @Override
-                public void onSeekProcessed() {
-
-                }
-
-            });
-
-            player.setPlayWhenReady(true); //run file/link when ready to play.
-            player.setVideoDebugListener(this); //for listening to resolution change and  outputing the resolution
-        }//End of onCreate
-
-        @Override
-        public void onVideoEnabled(DecoderCounters counters) {
-
-        }
-
-        @Override
-        public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
-
-        }
-
-        @Override
-        public void onVideoInputFormatChanged(Format format) {
-
-        }
-
-        @Override
-        public void onDroppedFrames(int count, long elapsedMs) {
-
-        }
-
-        @Override
-        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        }
-
-        @Override
-        public void onRenderedFirstFrame(Surface surface) {
-
-        }
-
-        @Override
-        public void onVideoDisabled(DecoderCounters counters) {
-
-        }
+            }
 
 
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                Log.v(TAG, "Listener-onPlaybackParametersChanged...");
+            }
+
+            @Override
+            public void onSeekProcessed() {
+
+            }
+
+        });
+
+        player.setPlayWhenReady(true); //run file/link when ready to play.
+        player.setVideoDebugListener(this); //for listening to resolution change and  outputing the resolution
+    }//End of onCreate
+
+    @Override
+    public void onVideoEnabled(DecoderCounters counters) {
+
+    }
+
+    @Override
+    public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+
+    }
+
+    @Override
+    public void onVideoInputFormatChanged(Format format) {
+
+    }
+
+    @Override
+    public void onDroppedFrames(int count, long elapsedMs) {
+
+    }
+
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+    }
+
+    @Override
+    public void onRenderedFirstFrame(Surface surface) {
+
+    }
+
+    @Override
+    public void onVideoDisabled(DecoderCounters counters) {
+
+    }
 
 
 //-------------------------------------------------------ANDROID LIFECYCLE---------------------------------------------------------------------------------------------
 
-        @Override
-        protected void onStop() {
-            super.onStop();
-            Log.v(TAG, "onStop()...");
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v(TAG, "onStop()...");
+    }
 
-        @Override
-        protected void onStart() {
-            super.onStart();
-            Log.v(TAG, "onStart()...");
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.v(TAG, "onStart()...");
+    }
 
-        @Override
-        protected void onResume() {
-            super.onResume();
-            Log.v(TAG, "onResume()...");
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v(TAG, "onResume()...");
+    }
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            Log.v(TAG, "onPause()...");
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.v(TAG, "onPause()...");
+    }
 
-        @Override
-        protected void onDestroy() {
-            super.onDestroy();
-            Log.v(TAG, "onDestroy()...");
-            player.release();
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG, "onDestroy()...");
+        player.release();
+    }
+
     class VisitorCountLoader extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -259,6 +254,7 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
             }, 4 * 1000);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_player, menu);
