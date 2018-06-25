@@ -14,10 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,6 +41,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -49,7 +54,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class PlayerFullAcivity extends AppCompatActivity implements VideoRendererEventListener {
+public class PlayerFullAcivity extends AppCompatActivity implements VideoRendererEventListener, View.OnTouchListener {
     private static final String TAG = "PlayerFullAcivity";
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
@@ -63,12 +68,21 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
             decorView.setSystemUiVisibility(uiOptions);
         }
     }
+    public boolean onTouch(View v, MotionEvent event) {
+        setNavigationBarVisibility(false);
+
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.player_full);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        FrameLayout Layout = (FrameLayout) findViewById(R.id.root);
+        Layout.setOnTouchListener(this);
         findViewById(R.id.appBar).bringToFront();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -90,6 +104,8 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
         simpleExoPlayerView.setUseController(false);
         simpleExoPlayerView.requestFocus();
         simpleExoPlayerView.setPlayer(player);
+        simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 
 
         DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
@@ -100,9 +116,10 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
         player.prepare(loopingSource);
 
         player.addListener(new ExoPlayer.EventListener() {
+
             @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-                Log.v(TAG, "Listener-onTimelineChanged...");
+            public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+
             }
 
             @Override
@@ -226,6 +243,11 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
         super.onDestroy();
         Log.v(TAG, "onDestroy()...");
         player.release();
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 
     class VisitorCountLoader extends AsyncTask<Void, Void, Integer> {

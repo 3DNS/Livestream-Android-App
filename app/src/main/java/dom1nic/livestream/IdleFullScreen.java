@@ -106,9 +106,10 @@ public class IdleFullScreen extends AppCompatActivity implements VideoRendererEv
         player.prepare(loopingSource);
 
         player.addListener(new ExoPlayer.EventListener() {
+
             @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-                Log.v(TAG, "Listener-onTimelineChanged...");
+            public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+
             }
 
             @Override
