@@ -105,12 +105,12 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
         simpleExoPlayerView.requestFocus();
         simpleExoPlayerView.setPlayer(player);
         simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+        //player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 
 
         DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
         DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "App"), bandwidthMeterA);
-        Uri URL = Uri.parse("https://rtmp.3dns.eu/dom1nic/" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8");
+        Uri URL = Uri.parse("https://live.3dns.eu/flv?port=1935&app=test" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "" : "sd") + "&stream=stream");
         MediaSource videoSource = new HlsMediaSource(URL, dataSourceFactory, 1, null, null);
         final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
         player.prepare(loopingSource);
@@ -298,7 +298,7 @@ public class PlayerFullAcivity extends AppCompatActivity implements VideoRendere
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("quali", item.isChecked()).apply();
             DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
             DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "App"), bandwidthMeterA);
-            Uri URL = Uri.parse("https://rtmp.3dns.eu/dom1nic/" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "hd" : "sd") + "/stream/index.m3u8");
+            Uri URL = Uri.parse("https://live.3dns.eu/flv?port=1935&app=test" + (PreferenceManager.getDefaultSharedPreferences(PlayerFullAcivity.this).getBoolean("quali", true) ? "" : "sd") + "&stream=stream");
             MediaSource videoSource = new HlsMediaSource(URL, dataSourceFactory, 1, null, null);
             final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
             player.prepare(loopingSource);
