@@ -7,25 +7,9 @@
         android:title="@string/action_website"
         app:showAsAction="never" />
     <item
-        android:id="@+id/last"
-        android:title="@string/last"
-        android:visible="false"
-        android:icon="@drawable/ic_av_timer_white_48dp"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/last_text"
-        android:title="@string/last"
-        android:visible="false"
-        app:showAsAction="withText" />
-    <item
         android:id="@+id/noti"
         android:checkable="true"
         android:title="Benachrichtigung"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/quali"
-        android:checkable="true"
-        android:title="HD Qualität"
         app:showAsAction="never" />
     <item
         android:id="@+id/close"
