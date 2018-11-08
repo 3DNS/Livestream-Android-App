@@ -1,4 +1,4 @@
-package dom1nic.livestream;
+package dns.livestream;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 
 public class PlayerReceiver extends BroadcastReceiver {
-    public static final String live = "dom1nic.livestream.LIVE";
+    public static final String live = "dns.livestream.LIVE";
     public static final int MINUTEN = 2;
 
     public PlayerReceiver() {

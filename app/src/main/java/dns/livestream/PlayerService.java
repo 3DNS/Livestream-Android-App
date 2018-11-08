@@ -1,4 +1,4 @@
-package dom1nic.livestream;
+package dns.livestream;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;

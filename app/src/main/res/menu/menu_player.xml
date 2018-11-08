@@ -1,13 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="dom1nic.livestream.MainActivity">
-    <item
-        android:id="@+id/quali"
-        android:checkable="true"
-        android:title="HD Qualität"
-        android:icon="@drawable/ic_hd_white_48dp"
-        app:showAsAction="always" />
+    tools:context="dns.livestream.MainActivity">
     <item
         android:id="@+id/noti"
         android:checkable="true"

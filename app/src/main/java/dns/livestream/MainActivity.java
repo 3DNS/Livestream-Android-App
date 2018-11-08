@@ -1,4 +1,4 @@
-package dom1nic.livestream;
+package dns.livestream;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
